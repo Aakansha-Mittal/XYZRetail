@@ -1,5 +1,5 @@
 package com.xyzreatil.entity;
 
-public class User {
+public class Customer {
 
 }
