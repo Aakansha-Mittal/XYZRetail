@@ -20,6 +20,7 @@ import com.xyzreatil.exception.AuthenticationException;
 import com.xyzreatil.exception.CartNotFoundException;
 import com.xyzreatil.exception.CategoryNotFoundException;
 import com.xyzreatil.exception.ItemNotFoundException;
+import com.xyzreatil.exception.NegativeQuantityException;
 import com.xyzreatil.exception.OutOfStockException;
 
 public class RetailDAOImpl implements RetailDAO {
@@ -39,11 +40,11 @@ public class RetailDAOImpl implements RetailDAO {
 			ps.setString(2, password);
 
 			ResultSet rs = ps.executeQuery();
-			while(rs.next()) {
+			while (rs.next()) {
 				id = rs.getInt(1);
 			}
 			return id;
-		}catch (SQLException | ClassNotFoundException e) {
+		} catch (SQLException | ClassNotFoundException e) {
 			e.printStackTrace();
 		}
 		return 0;
@@ -74,22 +75,23 @@ public class RetailDAOImpl implements RetailDAO {
 			ps.setString(1, categoryName);
 			ResultSet rs = ps.executeQuery();
 
-			while (rs.next()) {
-				items.add(new Item(rs.getInt("itemId"), rs.getString("itemName"), rs.getInt("quantity"),
-						rs.getDouble("unitPrice"), rs.getString("categoryName"), rs.getInt("categoryId"),
-						rs.getDouble("tax")));
+			if (!rs.next()) {
+				throw new CategoryNotFoundException("Category not found!");
 			}
-		} catch (Exception e) {
-			throw new CategoryNotFoundException("Category not found!");
+			items.add(new Item(rs.getInt("itemId"), rs.getString("itemName"), rs.getInt("quantity"),
+					rs.getDouble("unitPrice"), rs.getString("categoryName"), rs.getInt("categoryId"),
+					rs.getDouble("tax")));
+		} catch (SQLException | ClassNotFoundException e) {
+			e.printStackTrace();
 		}
 		return items;
 	}
 
 	@Override
 	public void insertItemToCart(int customerId, int itemId, int quantity)
-			throws ItemNotFoundException, OutOfStockException {
+			throws ItemNotFoundException, OutOfStockException, NegativeQuantityException {
 		try (Connection connection = getConnection()) {
-			
+
 			PreparedStatement ps = connection.prepareStatement("SELECT quantity, itemName FROM item WHERE itemId=?");
 			ps.setInt(1, itemId);
 			ResultSet rs = ps.executeQuery();
@@ -98,10 +100,14 @@ public class RetailDAOImpl implements RetailDAO {
 				throw new ItemNotFoundException("Item not found!");
 			int availableQty = rs.getInt("quantity");
 			String itemName = rs.getString("itemName");
+			
+			if(quantity <= 0)
+				throw new NegativeQuantityException("Quantity can not be negative or less than zero!\n");
 			if (availableQty < quantity)
 				throw new OutOfStockException("Not enough stock!");
-			
-			ps = connection.prepareStatement("INSERT INTO cart(customerId, itemId, quantity, itemName) VALUES(?,?,?,?)");
+
+			ps = connection
+					.prepareStatement("INSERT INTO cart(customerId, itemId, quantity, itemName) VALUES(?,?,?,?)");
 			ps.setInt(1, customerId);
 			ps.setInt(2, itemId);
 			ps.setInt(3, quantity);
@@ -167,15 +173,14 @@ public class RetailDAOImpl implements RetailDAO {
 				transactionId = rs.getInt(1);
 
 			for (TransactionItem tItem : transactionItems) {
-				ps = connection.prepareStatement(
-						"INSERT INTO transactionItem(transactionId, itemId, quantity) VALUES(?,?,?)");
+				ps = connection
+						.prepareStatement("INSERT INTO transactionItem(transactionId, itemId, quantity) VALUES(?,?,?)");
 				ps.setInt(1, transactionId);
 				ps.setInt(2, tItem.getItemId());
 				ps.setInt(3, tItem.getQuantity());
 				ps.executeUpdate();
 			}
 
-		
 			ps = connection.prepareStatement("DELETE FROM cart WHERE customerId=?");
 			ps.setInt(1, transaction.getCustomerId());
 			ps.executeUpdate();
@@ -183,10 +188,10 @@ public class RetailDAOImpl implements RetailDAO {
 			connection.commit();
 
 			bill.setBillId(transactionId);
-			bill.setCustomerUsername("dummy"); 
+			bill.setCustomerUsername("dummy");
 			bill.setBillDate(LocalDateTime.now());
 			bill.setTotalAmount(transaction.getTotalAmount());
-			bill.setItems(new ArrayList<>()); 
+			bill.setItems(new ArrayList<>());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

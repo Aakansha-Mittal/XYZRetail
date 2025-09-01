@@ -11,11 +11,12 @@ public class Client {
 
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-
+		int wrongCount =0;
 		Scanner scanner = new Scanner(System.in);
 
 		RetailPresentation retailPresentation = new RetailPresentationImpl();
 		try {
+			while (wrongCount <3 ) {
 			if (retailPresentation.loginPage()) {
 				while (true) {
 					retailPresentation.showMenu();
@@ -24,8 +25,11 @@ public class Client {
 					retailPresentation.performMenu(choice);
 				}
 			}
-		} catch (AuthenticationException e) {
-			System.out.println("Login failed: " + e.getMessage());
+			}
+		}
+		catch (AuthenticationException e) {
+			System.out.println("\nERROR MESSAGE Login failed: " + e.getMessage() + "\n");
+			wrongCount++;
 		}
 	}
 

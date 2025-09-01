@@ -11,6 +11,7 @@ import com.xyzreatil.exception.AuthenticationException;
 import com.xyzreatil.exception.CartNotFoundException;
 import com.xyzreatil.exception.CategoryNotFoundException;
 import com.xyzreatil.exception.ItemNotFoundException;
+import com.xyzreatil.exception.NegativeQuantityException;
 import com.xyzreatil.exception.OutOfStockException;
 import com.xyzreatil.service.RetailServiceImpl;
 import com.xyzreatil.service.RetailService;
@@ -58,16 +59,22 @@ public class RetailPresentationImpl implements RetailPresentation {
 		switch (choice) {
 		case 1:
 			ArrayList<Item> items = service.viewAllItems();
-			items.forEach(System.out::println);
+			for(Item item : items) {
+				System.out.println(item);
+			}
 			break;
 		case 2:
 			System.out.println("Enter category:");
-			String cat = sc.nextLine();
+			String category = sc.nextLine();
 			try {
-				ArrayList<Item> catItems = service.searchByCategory(cat);
-				catItems.forEach(System.out::println);
+				ArrayList<Item> catItems = service.searchByCategory(category);
+				//if(catItems.isEmpty())
+					//throw new CategoryNotFoundException("Category not found!");
+				for(Item item : catItems) {
+					System.out.println(item);
+				}
 			} catch (CategoryNotFoundException e) {
-				System.out.println(e.getMessage());
+				System.out.println("Category not found!!");
 			}
 			break;
 		case 3:
@@ -79,8 +86,11 @@ public class RetailPresentationImpl implements RetailPresentation {
 			} catch (ItemNotFoundException e) {
 				System.out.println("Item not found!!");
 			} catch (OutOfStockException e) {
-				System.out.println(e.getMessage());
-			} catch (Exception e) {
+				System.out.println("Item out of stock. Quantity is more than stock.\n");
+			} catch(NegativeQuantityException e) {
+				System.out.println("Quantity can not be negative.\n");
+			}
+			catch (Exception e) {
 				System.out.println(e.getMessage());
 			}
 			break;

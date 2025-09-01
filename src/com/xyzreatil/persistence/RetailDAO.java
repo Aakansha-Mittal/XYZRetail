@@ -12,6 +12,7 @@ import com.xyzreatil.exception.AuthenticationException;
 import com.xyzreatil.exception.CartNotFoundException;
 import com.xyzreatil.exception.CategoryNotFoundException;
 import com.xyzreatil.exception.ItemNotFoundException;
+import com.xyzreatil.exception.NegativeQuantityException;
 import com.xyzreatil.exception.OutOfStockException;
 
 public interface RetailDAO {
@@ -22,7 +23,7 @@ public interface RetailDAO {
 	
     ArrayList<Item> fetchItemsByCategory(String categoryName) throws CategoryNotFoundException;
     
-    void insertItemToCart(int customerId, int itemId, int quantity) throws ItemNotFoundException, OutOfStockException;
+    void insertItemToCart(int customerId, int itemId, int quantity) throws ItemNotFoundException, OutOfStockException, NegativeQuantityException;
     
     void deleteItemFromCart(int customerId, int itemId) throws ItemNotFoundException;
     

@@ -12,6 +12,7 @@ import com.xyzreatil.exception.AuthenticationException;
 import com.xyzreatil.exception.CartNotFoundException;
 import com.xyzreatil.exception.CategoryNotFoundException;
 import com.xyzreatil.exception.ItemNotFoundException;
+import com.xyzreatil.exception.NegativeQuantityException;
 import com.xyzreatil.exception.OutOfStockException;
 import com.xyzreatil.persistence.RetailDAO;
 import com.xyzreatil.persistence.RetailDAOImpl;
@@ -38,8 +39,8 @@ public class RetailServiceImpl implements RetailService {
 	}
 
 	@Override
-	public void addItemToCart(String username, int itemId, int quantity)
-			throws ItemNotFoundException, OutOfStockException {
+	public void addItemToCart(String username, int itemId, int quantity) 
+			throws ItemNotFoundException, OutOfStockException, NegativeQuantityException  {
 		//int customerId = getCustomerId(username);
 		retailDAOImpl.insertItemToCart(customerId, itemId, quantity);
 	}
@@ -71,8 +72,4 @@ public class RetailServiceImpl implements RetailService {
 		return retailDAOImpl.saveTransaction(transaction, tItems);
 
 	}
-
-	/*private int getCustomerId(String username) {
-		return 1;
-	}*/
 }

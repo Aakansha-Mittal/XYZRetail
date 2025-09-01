@@ -10,6 +10,7 @@ import com.xyzreatil.exception.AuthenticationException;
 import com.xyzreatil.exception.CartNotFoundException;
 import com.xyzreatil.exception.CategoryNotFoundException;
 import com.xyzreatil.exception.ItemNotFoundException;
+import com.xyzreatil.exception.NegativeQuantityException;
 import com.xyzreatil.exception.OutOfStockException;
 
 public interface RetailService {
@@ -20,7 +21,7 @@ public interface RetailService {
     
     ArrayList<Item> searchByCategory(String categoryName) throws CategoryNotFoundException;
     
-    void addItemToCart(String username, int itemId, int quantity) throws ItemNotFoundException, OutOfStockException;
+    void addItemToCart(String username, int itemId, int quantity) throws ItemNotFoundException, OutOfStockException, NegativeQuantityException ;
     
     void removeItemFromCart(String username, int itemId) throws ItemNotFoundException;
         
