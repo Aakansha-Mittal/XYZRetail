@@ -8,6 +8,7 @@ public class Item {
     private String categoryName;
     private int categoryId;
     private double tax;
+    
 	public int getItemId() {
 		return itemId;
 	}
@@ -65,6 +66,12 @@ public class Item {
     public Item() {
     	
     }
+	@Override
+	public String toString() {
+		return "Item [itemId=" + itemId + ", itemName=" + itemName + ", quantity=" + quantity + ", unitPrice="
+				+ unitPrice + ", categoryName=" + categoryName + ", categoryId=" + categoryId + ", tax=" + tax + "]";
+	}
 	
+    
 
 }

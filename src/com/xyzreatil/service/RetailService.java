@@ -1,5 +1,6 @@
 package com.xyzreatil.service;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 import com.xyzreatil.entity.Bill;
@@ -13,7 +14,7 @@ import com.xyzreatil.exception.OutOfStockException;
 
 public interface RetailService {
 	
-	boolean login(String username, String password) throws AuthenticationException;
+	int login(String username, String password) throws AuthenticationException ;
 	
     ArrayList<Item> viewAllItems();
     
@@ -22,12 +23,10 @@ public interface RetailService {
     void addItemToCart(String username, int itemId, int quantity) throws ItemNotFoundException, OutOfStockException;
     
     void removeItemFromCart(String username, int itemId) throws ItemNotFoundException;
-    
-    //ArrayList<Item> viewCart(String username) throws CartNotFoundException;
-    
+        
     ArrayList<CartItem> viewCart(String username) throws CartNotFoundException;
     
-    Bill checkoutAndGenerateBill(String userName);
+    Bill checkoutAndGenerateBill(String userName) throws CartNotFoundException;
 	
 
 }

@@ -1,5 +1,6 @@
 package com.xyzreatil.persistence;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 import com.xyzreatil.entity.Bill;
@@ -15,12 +16,18 @@ import com.xyzreatil.exception.OutOfStockException;
 
 public interface RetailDAO {
 	
-	boolean validateCustomer(String username, String password) throws AuthenticationException;
+	int validateCustomer(String username, String password) throws AuthenticationException;
+	
 	ArrayList<Item> fetchAllItems();
+	
     ArrayList<Item> fetchItemsByCategory(String categoryName) throws CategoryNotFoundException;
+    
     void insertItemToCart(int customerId, int itemId, int quantity) throws ItemNotFoundException, OutOfStockException;
+    
     void deleteItemFromCart(int customerId, int itemId) throws ItemNotFoundException;
+    
     ArrayList<CartItem> fetchCart(int customerId) throws CartNotFoundException;
+    
     Bill saveTransaction(Transaction transaction, ArrayList<TransactionItem> transactionItems);
     
 }
