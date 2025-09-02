@@ -41,7 +41,7 @@ public class RetailDAOImpl implements RetailDAO {
 
 			ResultSet rs = ps.executeQuery();
 			while (rs.next()) {
-				id = rs.getInt(1);
+				id = rs.getInt("customerId");
 			}
 			return id;
 		} catch (SQLException | ClassNotFoundException e) {

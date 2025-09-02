@@ -11,12 +11,11 @@ public class Client {
 
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-		int wrongCount =0;
+		int wrongCount = 0;
 		Scanner scanner = new Scanner(System.in);
 
 		RetailPresentation retailPresentation = new RetailPresentationImpl();
-		try {
-			while (wrongCount <3 ) {
+		 mainMenu: while(wrongCount < 3) {
 			if (retailPresentation.loginPage()) {
 				while (true) {
 					retailPresentation.showMenu();
@@ -25,12 +24,16 @@ public class Client {
 					retailPresentation.performMenu(choice);
 				}
 			}
+			else {
+				System.out.println("\nWrong Credentials.Please try again.\n");
+				wrongCount++;
+				continue mainMenu;
 			}
 		}
-		catch (AuthenticationException e) {
-			System.out.println("\nERROR MESSAGE : INVALID USERNAME OR PASSWORD.\n");
-			wrongCount++;
-		}
+		 if (wrongCount == 3) {
+			 System.out.println("\n Sorry, You have reached the limit of login.");
+		 }
+
 	}
 
 }

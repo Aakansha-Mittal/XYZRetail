@@ -6,7 +6,7 @@ import com.xyzreatil.exception.AuthenticationException;
 
 public interface RetailPresentation {
 	
-	boolean loginPage() throws AuthenticationException;
+	boolean loginPage() ;
     void showMenu();
     void performMenu(int choice);
 }
