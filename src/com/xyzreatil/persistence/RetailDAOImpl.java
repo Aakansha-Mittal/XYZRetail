@@ -89,48 +89,89 @@ public class RetailDAOImpl implements RetailDAO {
 
 	@Override
 	public void insertItemToCart(int customerId, int itemId, int quantity)
-			throws ItemNotFoundException, OutOfStockException, NegativeQuantityException {
-		try (Connection connection = getConnection()) {
+	        throws ItemNotFoundException, OutOfStockException {
+	    try (Connection connection = getConnection()) {
 
-			PreparedStatement ps = connection.prepareStatement("SELECT quantity, itemName FROM item WHERE itemId=?");
-			ps.setInt(1, itemId);
-			ResultSet rs = ps.executeQuery();
+	        // 1. Check available stock
+	        PreparedStatement ps = connection.prepareStatement("SELECT quantity, itemName FROM item WHERE itemId=?");
+	        ps.setInt(1, itemId);
+	        ResultSet rs = ps.executeQuery();
 
-			if (!rs.next())
-				throw new ItemNotFoundException("Item not found!");
-			int availableQty = rs.getInt("quantity");
-			String itemName = rs.getString("itemName");
-			
-			if(quantity <= 0)
-				throw new NegativeQuantityException("Quantity can not be negative or less than zero!\n");
-			if (availableQty < quantity)
-				throw new OutOfStockException("Not enough stock!");
+	        if (!rs.next())
+	            throw new ItemNotFoundException("Item not found!");
 
-			ps = connection
-					.prepareStatement("INSERT INTO cart(customerId, itemId, quantity, itemName) VALUES(?,?,?,?)");
-			ps.setInt(1, customerId);
-			ps.setInt(2, itemId);
-			ps.setInt(3, quantity);
-			ps.setString(4, itemName);
-			ps.executeUpdate();
-		} catch (SQLException | ClassNotFoundException e) {
-			e.printStackTrace();
-		}
+	        int availableQty = rs.getInt("quantity");
+	        String itemName = rs.getString("itemName");
+
+	        if (availableQty < quantity)
+	            throw new OutOfStockException("Not enough stock!");
+
+	        // 2. Check if item already exists in cart
+	        ps = connection.prepareStatement("SELECT quantity FROM cart WHERE customerId=? AND itemId=?");
+	        ps.setInt(1, customerId);
+	        ps.setInt(2, itemId);
+	        rs = ps.executeQuery();
+
+	        if (rs.next()) {
+	            // If item exists, update quantity
+	            int existingQty = rs.getInt("quantity");
+	            ps = connection.prepareStatement("UPDATE cart SET quantity = ? WHERE customerId=? AND itemId=?");
+	            ps.setInt(1, existingQty + quantity);
+	            ps.setInt(2, customerId);
+	            ps.setInt(3, itemId);
+	            ps.executeUpdate();
+	        } else {
+	            // If item does not exist, insert new row
+	            ps = connection.prepareStatement("INSERT INTO cart(customerId, itemId, quantity, itemName) VALUES(?,?,?,?)");
+	            ps.setInt(1, customerId);
+	            ps.setInt(2, itemId);
+	            ps.setInt(3, quantity);
+	            ps.setString(4, itemName);
+	            ps.executeUpdate();
+	        }
+
+	        // 3. Reduce stock in item table
+	        ps = connection.prepareStatement("UPDATE item SET quantity = quantity - ? WHERE itemId=?");
+	        ps.setInt(1, quantity);
+	        ps.setInt(2, itemId);
+	        ps.executeUpdate();
+
+	    } catch (SQLException | ClassNotFoundException e) {
+	        e.printStackTrace();
+	    }
 	}
 
 	@Override
 	public void deleteItemFromCart(int customerId, int itemId) throws ItemNotFoundException {
-		try (Connection connection = getConnection()) {
-			PreparedStatement ps = connection.prepareStatement("DELETE FROM cart WHERE customerId=? AND itemId=?");
-			ps.setInt(1, customerId);
-			ps.setInt(2, itemId);
-			int rows = ps.executeUpdate();
-			if (rows == 0)
-				throw new ItemNotFoundException("Item not in cart");
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+	    try (Connection connection = getConnection()) {
+	        // 1. Get the quantity of the item in the cart
+	        PreparedStatement ps = connection.prepareStatement("SELECT quantity FROM cart WHERE customerId=? AND itemId=?");
+	        ps.setInt(1, customerId);
+	        ps.setInt(2, itemId);
+	        ResultSet rs = ps.executeQuery();
+
+	        if (!rs.next())
+	            throw new ItemNotFoundException("Item not in cart");
+
+	        int quantityInCart = rs.getInt("quantity");
+
+	        // 2. Delete item from cart
+	        ps = connection.prepareStatement("DELETE FROM cart WHERE customerId=? AND itemId=?");
+	        ps.setInt(1, customerId);
+	        ps.setInt(2, itemId);
+	        ps.executeUpdate();
+
+	        // 3. Increase stock in item table
+	        ps = connection.prepareStatement("UPDATE item SET quantity = quantity + ? WHERE itemId=?");
+	        ps.setInt(1, quantityInCart);
+	        ps.setInt(2, itemId);
+	        ps.executeUpdate();
+
+	    } catch (SQLException | ClassNotFoundException e) {
+	        e.printStackTrace();
+	    }
 	}
+
 
 	@Override
 	public ArrayList<CartItem> fetchCart(int customerId) throws CartNotFoundException {
