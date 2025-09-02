@@ -22,21 +22,29 @@ public class RetailPresentationImpl implements RetailPresentation {
 	private String loggedInUser;
 
 	@Override
-	public boolean loginPage() throws AuthenticationException {
+	public boolean loginPage() {
 		Scanner sc = new Scanner(System.in);
-
-		System.out.print("Enter username: ");
-		String username = sc.nextLine();
-		System.out.print("Enter password: ");
-		String password = sc.nextLine();
-
-		if (service.login(username, password) != 0) {
-			System.out.println("\nLogin successful! Welcome " + username);
-			loggedInUser = username;
-			return true;
-		} else {
-			throw new AuthenticationException("\nERROR MESSAGE : INVALID USERNAME OR PASSWORD.\n");
+		String username = null;
+		String password = null;
+		try {
+			System.out.print("Enter username: ");
+			username = sc.nextLine();
+			System.out.print("Enter password: ");
+			password = sc.nextLine();
+			if (service.login(username, password) != 0) {
+				System.out.println("\nLogin successful! Welcome " + username);
+				loggedInUser = username;
+				return true;
+			}
+		} catch (AuthenticationException e) {
+			System.out.println("\nERROR MESSAGE : INVALID USERNAME OR PASSWORD.\n");
+			return false;
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+			return false;
 		}
+		//System.out.println(username + " " + password);
+		return false;
 	}
 
 	@Override
@@ -64,7 +72,7 @@ public class RetailPresentationImpl implements RetailPresentation {
 			ArrayList<Item> items = service.viewAllItems();
 			System.out.println("\n");
 			System.out.println("===  All items ==== \n");
-			for(Item item : items) {
+			for (Item item : items) {
 				System.out.println(item);
 				System.out.println("\n");
 			}
@@ -75,9 +83,9 @@ public class RetailPresentationImpl implements RetailPresentation {
 			String category = sc.nextLine();
 			try {
 				ArrayList<Item> catItems = service.searchByCategory(category);
-				//if(catItems.isEmpty())
-					//throw new CategoryNotFoundException("Category not found!");
-				for(Item item : catItems) {
+				// if(catItems.isEmpty())
+				// throw new CategoryNotFoundException("Category not found!");
+				for (Item item : catItems) {
 					System.out.println("\n");
 					System.out.println(item);
 				}
@@ -99,10 +107,9 @@ public class RetailPresentationImpl implements RetailPresentation {
 				System.out.println("\nERROR MESSAGE - ITEM NOT FOUND!!\n");
 			} catch (OutOfStockException e) {
 				System.out.println("\nERROR MESSAGE - QUANTITY IS MORE THAN STOCK !! \n");
-			} catch(NegativeQuantityException e) {
+			} catch (NegativeQuantityException e) {
 				System.out.println("\nERROR MESSAGE - QUANTITY CAN NEVER BE NEGATIVE !! \n");
-			}
-			catch (Exception e) {
+			} catch (Exception e) {
 				System.out.println(e.getMessage());
 			}
 			break;
