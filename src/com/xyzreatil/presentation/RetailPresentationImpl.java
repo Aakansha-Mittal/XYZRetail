@@ -31,17 +31,20 @@ public class RetailPresentationImpl implements RetailPresentation {
 		String password = sc.nextLine();
 
 		if (service.login(username, password) != 0) {
-			System.out.println("Login successful! Welcome " + username);
+			System.out.println("\nLogin successful! Welcome " + username);
 			loggedInUser = username;
 			return true;
 		} else {
-			throw new AuthenticationException("Invalid username or password");
+			throw new AuthenticationException("\nERROR MESSAGE : INVALID USERNAME OR PASSWORD.\n");
 		}
 	}
 
 	@Override
 	public void showMenu() {
 		// TODO Auto-generated method stub
+		System.out.println("\n");
+		System.out.println("========= XYZ Retail System ============");
+		System.out.println("\n");
 		System.out.println("1. View All Items");
 		System.out.println("2. Search By Category");
 		System.out.println("3. Add Item To Cart");
@@ -59,11 +62,15 @@ public class RetailPresentationImpl implements RetailPresentation {
 		switch (choice) {
 		case 1:
 			ArrayList<Item> items = service.viewAllItems();
+			System.out.println("\n");
+			System.out.println("===  All items ==== \n");
 			for(Item item : items) {
 				System.out.println(item);
+				System.out.println("\n");
 			}
 			break;
 		case 2:
+			System.out.println("\n");
 			System.out.println("Enter category:");
 			String category = sc.nextLine();
 			try {
@@ -71,34 +78,41 @@ public class RetailPresentationImpl implements RetailPresentation {
 				//if(catItems.isEmpty())
 					//throw new CategoryNotFoundException("Category not found!");
 				for(Item item : catItems) {
+					System.out.println("\n");
 					System.out.println(item);
 				}
 			} catch (CategoryNotFoundException e) {
-				System.out.println("Category not found!!");
+				System.out.println("\n");
+				System.out.println("ERROR MESSAGE - CATEGORY NOT FOUND!!");
+				System.out.println("\n");
 			}
 			break;
 		case 3:
+			System.out.println("\n");
 			System.out.println("Enter itemId and quantity:");
 			int id = sc.nextInt();
 			int qty = sc.nextInt();
 			try {
 				service.addItemToCart(loggedInUser, id, qty);
+				System.out.println("\nItem added successfully !!\n");
 			} catch (ItemNotFoundException e) {
-				System.out.println("Item not found!!");
+				System.out.println("\nERROR MESSAGE - ITEM NOT FOUND!!\n");
 			} catch (OutOfStockException e) {
-				System.out.println("Item out of stock. Quantity is more than stock.\n");
+				System.out.println("\nERROR MESSAGE - QUANTITY IS MORE THAN STOCK !! \n");
 			} catch(NegativeQuantityException e) {
-				System.out.println("Quantity can not be negative.\n");
+				System.out.println("\nERROR MESSAGE - QUANTITY CAN NEVER BE NEGATIVE !! \n");
 			}
 			catch (Exception e) {
 				System.out.println(e.getMessage());
 			}
 			break;
 		case 4:
+			System.out.println("\n");
 			System.out.println("Enter itemId to remove:");
 			int removeId = sc.nextInt();
 			try {
 				service.removeItemFromCart(loggedInUser, removeId);
+				System.out.println("\nItem remove successfully !! \n");
 			} catch (Exception e) {
 				System.out.println(e.getMessage());
 			}
@@ -106,6 +120,7 @@ public class RetailPresentationImpl implements RetailPresentation {
 		case 5:
 			try {
 				ArrayList<CartItem> cart = service.viewCart(loggedInUser);
+				System.out.println("\n");
 				cart.forEach(System.out::println);
 			} catch (CartNotFoundException e) {
 				System.out.println(e.getMessage());
@@ -114,16 +129,16 @@ public class RetailPresentationImpl implements RetailPresentation {
 		case 6:
 			try {
 				Bill bill = service.checkoutAndGenerateBill(loggedInUser);
-				System.out.println("Bill Generated: " + bill);
+				System.out.println("\nBill Generated: \n" + bill);
 			} catch (CartNotFoundException e) {
-				System.out.println("Cart is empty, cannot checkout!");
+				System.out.println("\n ERROR MESSAGE - CART IS EMPTY, CANNOT CHECKOUT !!\n");
 			}
 			break;
 		case 7:
 			System.out.println("Thank you!");
 			System.exit(0);
 		default:
-			System.out.println("Invalid choice!");
+			System.out.println("\nInvalid Choice !! \n");
 		}
 
 	}

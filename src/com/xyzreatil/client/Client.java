@@ -28,7 +28,7 @@ public class Client {
 			}
 		}
 		catch (AuthenticationException e) {
-			System.out.println("\nERROR MESSAGE Login failed: " + e.getMessage() + "\n");
+			System.out.println("\nERROR MESSAGE : INVALID USERNAME OR PASSWORD.\n");
 			wrongCount++;
 		}
 	}

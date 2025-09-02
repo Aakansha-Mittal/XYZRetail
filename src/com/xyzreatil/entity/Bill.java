@@ -61,8 +61,8 @@ public class Bill {
 	}
 	@Override
 	public String toString() {
-		return "Bill [billId=" + billId + "\n, customerUsername=" + customerUsername + "\n, billDate=" + billDate
-				+ "\n, items=" + items + "\n, totalTax=" + totalTax + "\n, totalAmount=" + totalAmount + "]";
+		return "\nBillId=" + billId + "\nCustomer Username=" + customerUsername + "\nBillDate=" + billDate
+				+ "\nItems=" + items + "\nTotal Tax=" + totalTax + "\nTotal Amount=" + totalAmount ;
 	}  
 	
 	
